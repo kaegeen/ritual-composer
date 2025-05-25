@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Micro Ritual Composer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-6">
+
+  <div class="w-full max-w-xl bg-white p-6 rounded shadow">
+    <h1 class="text-xl font-bold mb-4 text-center">Micro Ritual Composer</h1>
+
+    <form id="ritualForm" class="space-y-4">
+      <input type="text" id="ritualName" placeholder="Ritual name" class="w-full border p-2 rounded" required>
+      <textarea id="steps" rows="3" placeholder="Enter steps, one per line..." class="w-full border p-2 rounded" required></textarea>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Ritual</button>
+    </form>
+
+    <div id="ritualsList" class="mt-8 space-y-4">
+      <h2 class="text-lg font-semibold">Saved Rituals</h2>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('ritualForm');
+    const ritualsList = document.getElementById('ritualsList');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('ritualName').value.trim();
+      const steps = document.getElementById('steps').value.trim().split('\n');
+      const rituals = JSON.parse(localStorage.getItem('rituals') || '[]');
+      rituals.push({ name, steps });
+      localStorage.setItem('rituals', JSON.stringify(rituals));
+      form.reset();
+      displayRituals();
+    });
+
+    function displayRituals() {
+      const rituals = JSON.parse(localStorage.getItem('rituals') || '[]');
+      const html = rituals.map((ritual, index) => `
+        <div class="border p-4 rounded shadow-sm">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold">${ritual.name}</h3>
+            <button onclick="runRitual(${index})" class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Run</button>
+          </div>
+          <ul class="list-disc list-inside text-sm">
+            ${ritual.steps.map(step => `<li>${step}</li>`).join('')}
+          </ul>
+        </div>
+      `).join('');
+      ritualsList.innerHTML = `<h2 class="text-lg font-semibold mb-2">Saved Rituals</h2>${html}`;
+    }
+
+    function runRitual(index) {
+      const rituals = JSON.parse(localStorage.getItem('rituals') || '[]');
+      const ritual = rituals[index];
+      alert(`Running: ${ritual.name}\n\n${ritual.steps.join('\n')}`);
+    }
+
+    displayRituals();
+  </script>
+
+</body>
+</html>
